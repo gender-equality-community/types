@@ -34,10 +34,10 @@ const (
 
 // Message is, simply, the message to be passed between recipients
 type Message struct {
-	Source    Source    `mapstructure:"source"`
-	ID        string    `mapstructure:"id"`
-	Timestamp time.Time `mapstructure:"ts"`
-	Message   string    `mapstructure:"msg"`
+	Source    Source `mapstructure:"source"`
+	ID        string `mapstructure:"id"`
+	Timestamp int64  `mapstructure:"ts"`
+	Message   string `mapstructure:"msg"`
 }
 
 // NewMessage accepts a source, id and string, and returns a new Message
@@ -45,7 +45,7 @@ func NewMessage(source Source, id, msg string) Message {
 	return Message{
 		Source:    source,
 		ID:        id,
-		Timestamp: time.Now(),
+		Timestamp: time.Now().Unix(),
 		Message:   msg,
 	}
 }
@@ -63,4 +63,8 @@ func (m Message) Map() (o map[string]any) {
 	_ = mapstructure.Decode(m, &o)
 
 	return
+}
+
+func (m Message) GetTimestamp() time.Time {
+	return time.Unix(m.Timestamp, 0)
 }

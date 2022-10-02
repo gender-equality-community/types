@@ -2,7 +2,6 @@ package types
 
 import (
 	"testing"
-	"time"
 
 	"github.com/google/go-cmp/cmp"
 )
@@ -40,9 +39,9 @@ func TestParseMessage(t *testing.T) {
 		{"Happy path", map[string]interface{}{"source": 2, "ts": 0, "id": "some-id", "msg": "<3"}, Message{
 			Source:    SourceAutoresponse,
 			ID:        "some-id",
-			Timestamp: time.Time{},
+			Timestamp: 0,
 			Message:   "<3",
-		}, true},
+		}, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			m, err := ParseMessage(test.m)
@@ -65,13 +64,13 @@ func TestMessage_Map(t *testing.T) {
 		m      Message
 		expect map[string]any
 	}{
-		{"Empty message", Message{}, map[string]any{"id": "", "msg": "", "source": Source(0), "ts": map[string]any{}}},
+		{"Empty message", Message{}, map[string]any{"id": "", "msg": "", "source": Source(0), "ts": int64(0)}},
 		{"Happy path", Message{
 			Source:    SourceAutoresponse,
 			ID:        "some-id",
-			Timestamp: time.Time{},
+			Timestamp: 0,
 			Message:   "<3",
-		}, map[string]any{"source": Source(2), "ts": map[string]any{}, "id": "some-id", "msg": "<3"}},
+		}, map[string]any{"source": Source(2), "ts": int64(0), "id": "some-id", "msg": "<3"}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			m := test.m.Map()
@@ -80,5 +79,14 @@ func TestMessage_Map(t *testing.T) {
 				t.Error(cmp.Diff(test.expect, m))
 			}
 		})
+	}
+}
+
+func TestMessage_GetTimestamp(t *testing.T) {
+	expect := "2022-10-02 18:31:15 +0000 UTC"
+	got := Message{Timestamp: 1664735475}.GetTimestamp().UTC().String()
+
+	if expect != got {
+		t.Errorf("expected %q, received %q", expect, got)
 	}
 }
