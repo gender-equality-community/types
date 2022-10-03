@@ -6,11 +6,6 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-// Source signifies the source of a message; whether it's come
-// in from whatsapp, slack, some kind of auto-responder, or just
-// completely unknown
-type Source uint8
-
 const (
 	// SourceUnknown is where we simply ust don't know where a message comes from,
 	// and is largely only used for zero'd messages, or when errors stop the
@@ -31,6 +26,31 @@ const (
 	// dunno
 	SourceSlack
 )
+
+// Source signifies the source of a message; whether it's come
+// in from whatsapp, slack, some kind of auto-responder, or just
+// completely unknown
+type Source uint8
+
+// MarshalBinary implements the encoding.BinaryMarshaler interface
+// in order to serialise data to redis correctly
+func (s Source) MarshalBinary() ([]byte, error) {
+	return []byte{uint8(s)}, nil
+}
+
+// UnmarshalBinary implements the encoding.BinaryUnmarshaler interface
+// in order to serialise data _from_ redis correctly
+func (s *Source) UnmarshalBinary(data []byte) error {
+	if len(data) != 1 {
+		*s = SourceUnknown
+
+		return nil
+	}
+
+	*s = Source(data[0])
+
+	return nil
+}
 
 // Message is, simply, the message to be passed between recipients
 type Message struct {
