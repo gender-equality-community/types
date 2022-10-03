@@ -14,8 +14,8 @@ func TestSource_MarshalBinary(t *testing.T) {
 		s      Source
 		expect []byte
 	}{
-		{"Empty Source marshals to 0x0", empty, []byte{0x0}},
-		{"Autoresponse marshals to 0x2", SourceAutoresponse, []byte{0x2}},
+		{"Empty Source marshals to 0x0", empty, []byte("0")},
+		{"Autoresponse marshals to 0x2", SourceAutoresponse, []byte("2")},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			received, _ := test.s.MarshalBinary()
@@ -34,7 +34,7 @@ func TestSource_UnmarshalBinary(t *testing.T) {
 	}{
 		{"Empty Source unmarshals from 0x0", []byte{}, SourceUnknown},
 		{"Garbage/ broken data unmarshals to Unknown", []byte("hello, world!"), SourceUnknown},
-		{"Autoresponse unmarshals from 0x2", []byte{0x2}, SourceAutoresponse},
+		{"Autoresponse unmarshals from 0x2", []byte("2"), SourceAutoresponse},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			var received Source

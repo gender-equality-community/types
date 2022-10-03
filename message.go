@@ -37,19 +37,20 @@ type Source uint8
 // MarshalBinary implements the encoding.BinaryMarshaler interface
 // in order to serialise data to redis correctly
 func (s Source) MarshalBinary() ([]byte, error) {
-	return []byte{uint8(s)}, nil
+	return []byte(strconv.Itoa(int(s))), nil
 }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface
 // in order to serialise data _from_ redis correctly
 func (s *Source) UnmarshalBinary(data []byte) error {
-	if len(data) != 1 {
+	i, err := strconv.Atoi(string(data))
+	if err != nil {
 		*s = SourceUnknown
 
 		return nil
 	}
 
-	*s = Source(data[0])
+	*s = Source(i)
 
 	return nil
 }
@@ -99,7 +100,8 @@ func (m Message) Map() (o map[string]any) {
 // a localised time.Time based on this.
 //
 // Note: to get the time in UTC you'll need to do
-//    m.GetTimestamp().UTC()
+//
+//	m.GetTimestamp().UTC()
 func (m Message) GetTimestamp() time.Time {
 	return time.Unix(m.Timestamp, 0)
 }
