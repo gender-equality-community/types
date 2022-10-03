@@ -34,9 +34,15 @@ func TestParseMessage(t *testing.T) {
 		expect    Message
 		expectErr bool
 	}{
-		{"Bad types", map[string]interface{}{"source": 1, "ts": "invalid"}, Message{Source: SourceWhatsapp}, true},
+		{"Bad types", map[string]interface{}{"source": true, "ts": "invalid"}, Message{}, true},
 		{"Empty message", map[string]interface{}{}, Message{}, false},
 		{"Happy path", map[string]interface{}{"source": 2, "ts": 0, "id": "some-id", "msg": "<3"}, Message{
+			Source:    SourceAutoresponse,
+			ID:        "some-id",
+			Timestamp: 0,
+			Message:   "<3",
+		}, false},
+		{"Happy path, from redis", map[string]interface{}{"source": "2", "ts": "0", "id": "some-id", "msg": "<3"}, Message{
 			Source:    SourceAutoresponse,
 			ID:        "some-id",
 			Timestamp: 0,
