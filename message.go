@@ -61,6 +61,7 @@ type Message struct {
 	ID        string `mapstructure:"id"`
 	Timestamp int64  `mapstructure:"ts"`
 	Message   string `mapstructure:"msg"`
+	Sentiment int    `mapstructure:"sentiment"`
 }
 
 // NewMessage accepts a source, id and string, and returns a new Message
@@ -83,6 +84,7 @@ func ParseMessage(i map[string]any) (m Message, err error) {
 	// as strings
 	cast(i, "source")
 	cast(i, "ts")
+	cast(i, "sentiment")
 
 	err = mapstructure.Decode(i, &m)
 

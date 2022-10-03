@@ -77,17 +77,19 @@ func TestParseMessage(t *testing.T) {
 	}{
 		{"Bad types", map[string]interface{}{"source": true, "ts": "invalid"}, Message{}, true},
 		{"Empty message", map[string]interface{}{}, Message{}, false},
-		{"Happy path", map[string]interface{}{"source": 2, "ts": 0, "id": "some-id", "msg": "<3"}, Message{
+		{"Happy path", map[string]interface{}{"source": 2, "ts": 0, "id": "some-id", "msg": "<3", "sentiment": 2}, Message{
 			Source:    SourceAutoresponse,
 			ID:        "some-id",
 			Timestamp: 0,
 			Message:   "<3",
+			Sentiment: 2,
 		}, false},
-		{"Happy path, from redis", map[string]interface{}{"source": "2", "ts": "0", "id": "some-id", "msg": "<3"}, Message{
+		{"Happy path, from redis", map[string]interface{}{"source": "2", "ts": "0", "id": "some-id", "msg": "<3", "sentiment": "3"}, Message{
 			Source:    SourceAutoresponse,
 			ID:        "some-id",
 			Timestamp: 0,
 			Message:   "<3",
+			Sentiment: 3,
 		}, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
@@ -111,13 +113,13 @@ func TestMessage_Map(t *testing.T) {
 		m      Message
 		expect map[string]any
 	}{
-		{"Empty message", Message{}, map[string]any{"id": "", "msg": "", "source": Source(0), "ts": int64(0)}},
+		{"Empty message", Message{}, map[string]any{"id": "", "msg": "", "source": Source(0), "ts": int64(0), "sentiment": 0}},
 		{"Happy path", Message{
 			Source:    SourceAutoresponse,
 			ID:        "some-id",
 			Timestamp: 0,
 			Message:   "<3",
-		}, map[string]any{"source": Source(2), "ts": int64(0), "id": "some-id", "msg": "<3"}},
+		}, map[string]any{"source": Source(2), "ts": int64(0), "id": "some-id", "msg": "<3", "sentiment": 0}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			m := test.m.Map()
