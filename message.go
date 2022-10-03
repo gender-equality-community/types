@@ -1,6 +1,8 @@
 package types
 
 import (
+	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -73,6 +75,14 @@ func NewMessage(source Source, id, msg string) Message {
 // ParseMessage accepts a map, probably from redis, and turns it into a valid
 // Message for processing
 func ParseMessage(i map[string]any) (m Message, err error) {
+	// If inputs are strings, and we're not expecting strings, such
+	// as Source and Timestamp, then cast them properly.
+	//
+	// This happens when we read from redis, which treats all values
+	// as strings
+	cast(i, "source")
+	cast(i, "ts")
+
 	err = mapstructure.Decode(i, &m)
 
 	return
@@ -92,4 +102,13 @@ func (m Message) Map() (o map[string]any) {
 //    m.GetTimestamp().UTC()
 func (m Message) GetTimestamp() time.Time {
 	return time.Unix(m.Timestamp, 0)
+}
+
+func cast(i map[string]any, key string) {
+	v, ok := i[key]
+	if !ok || reflect.TypeOf(v).String() != "string" {
+		return
+	}
+
+	i[key], _ = strconv.Atoi(i[key].(string))
 }
