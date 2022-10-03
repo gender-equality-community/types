@@ -11,6 +11,8 @@
 ---
 # types
 
+types holds common data structures used across GEC components.
+
 ## Types
 
 ### type [Message](https://github.com/gender-equality-community/types/blob/main/message.go#L36)
@@ -18,6 +20,10 @@
 `type Message struct { ... }`
 
 Message is, simply, the message to be passed between recipients
+
+#### func (Message) [GetTimestamp](https://github.com/gender-equality-community/types/blob/main/message.go#L68)
+
+`func (m Message) GetTimestamp() time.Time`
 
 #### func (Message) [Map](https://github.com/gender-equality-community/types/blob/main/message.go#L62)
 

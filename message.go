@@ -65,6 +65,11 @@ func (m Message) Map() (o map[string]any) {
 	return
 }
 
+// GetTimestamp takes the unixtimestamp stored within a Message and returns
+// a localised time.Time based on this.
+//
+// Note: to get the time in UTC you'll need to do
+//    m.GetTimestamp().UTC()
 func (m Message) GetTimestamp() time.Time {
 	return time.Unix(m.Timestamp, 0)
 }
