@@ -6,6 +6,47 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+func TestSource_MarshalBinary(t *testing.T) {
+	var empty Source
+
+	for _, test := range []struct {
+		name   string
+		s      Source
+		expect []byte
+	}{
+		{"Empty Source marshals to 0x0", empty, []byte{0x0}},
+		{"Autoresponse marshals to 0x2", SourceAutoresponse, []byte{0x2}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			received, _ := test.s.MarshalBinary()
+			if !cmp.Equal(test.expect, received) {
+				t.Error(cmp.Diff(test.expect, received))
+			}
+		})
+	}
+}
+
+func TestSource_UnmarshalBinary(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		s      []byte
+		expect Source
+	}{
+		{"Empty Source unmarshals from 0x0", []byte{}, SourceUnknown},
+		{"Garbage/ broken data unmarshals to Unknown", []byte("hello, world!"), SourceUnknown},
+		{"Autoresponse unmarshals from 0x2", []byte{0x2}, SourceAutoresponse},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			var received Source
+
+			_ = received.UnmarshalBinary(test.s)
+			if !cmp.Equal(test.expect, received) {
+				t.Error(cmp.Diff(test.expect, received))
+			}
+		})
+	}
+}
+
 func TestNewMessage(t *testing.T) {
 	m := NewMessage(SourceAutoresponse, "some-id", "Hello, world!")
 
